@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import "./styles.css"
 
-function App() {
+import {BrowserRouter, Routes, Route} from "react-router-dom"
+import {useState, useEffect} from "react"
+import Context from "./context"
+import Navbar from "./components/Navbar"
+import Home from "./views/Home"
+import Favoritos from "./views/Favoritos"
+
+const App = () => {
+  const endpoint = "/fotos.json"
+  const [photos, setPhotos] = useState([])
+  const sharedStates = {photos, setPhotos}
+
+  useEffect(() => {
+    dataPhotos()
+  }, [])
+
+  const dataPhotos = async () => {
+    const resPhotos = await fetch(endpoint)
+    const dataPhotos = await resPhotos.json()
+    setPhotos([...dataPhotos.photos])
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Context.Provider value={sharedStates}>
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/favoritos" element={<Favoritos />} />
+          </Routes>
+        </BrowserRouter>
+      </Context.Provider>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
